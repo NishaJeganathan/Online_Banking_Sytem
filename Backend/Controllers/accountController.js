@@ -2,8 +2,8 @@ const Account = require("../Models/accountModel");
 
 exports.getUserAccounts = async (req, res) => {
   try {
-    const { bankId } = req.params; // "bank1", "bank2", or "bank3"
-    const userId = req.user.id; // from auth middleware
+    const { bankId } = req.params;
+    const userId = req.user.id; 
 
     const accounts = await Account.getAccountsByUser(bankId, userId);
     res.status(200).json(accounts);
@@ -26,7 +26,6 @@ exports.getAccountDetails = async (req, res) => {
   }
 };
 
-// Get balance of a specific account
 exports.getAccountBalance = async (req, res) => {
   try {
     const { bankId, acc_no } = req.params;
