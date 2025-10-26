@@ -1,20 +1,16 @@
-import jwt from 'jsonwebtoken'
+const jwt = require("jsonwebtoken");
 
-export const requireAuth = (roles = []) => {
-  return (req, res, next) => {
-    const header = req.headers.authorization
-    if (!header) return res.status(401).json({ message: 'No token' })
+exports.verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; 
 
-    const token = header.split(' ')[1]
-    try {
-      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
-      req.user = payload
-      if (roles.length && !roles.some(r => payload.roles.includes(r))) {
-        return res.status(403).json({ message: 'Forbidden' })
-      }
-      next()
-    } catch (err) {
-      res.status(401).json({ message: 'Invalid token' })
-    }
+  if (!token) return res.status(401).json({ message: "Access denied. No token provided." });
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified; 
+    next();
+  } catch (error) {
+    res.status(403).json({ message: "Invalid or expired token" });
   }
-}
+};

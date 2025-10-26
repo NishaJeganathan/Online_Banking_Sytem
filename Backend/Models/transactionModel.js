@@ -10,7 +10,16 @@ const TransactionModel = {
       await db.query(query, [newAmount, acc_no]);
     }
   },
-
+  
+  async  recordTransactionHistory({ bank_id, acc_no, recv_bank,recv_acc_no,amount, status }) {
+  const db = getBankDB(bank_id);
+  const query = `
+    INSERT INTO transactions (acc_no,recv_bank,recv_acc_no, amount, status)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const [result] = await db.query(query, [acc_no,recv_bank,recv_acc_no, amount, status]);
+  return result.transaction_id; // transaction_id_sender
+  },
   async recordTransaction(
     bankId,
     senderAcc,
@@ -36,6 +45,7 @@ const TransactionModel = {
       await db.query(query, [senderAcc, bankId, receiverAcc, amount, status]);
     }
   },
+
 };
 
 module.exports = TransactionModel;
