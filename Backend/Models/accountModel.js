@@ -25,6 +25,14 @@ const Account={
     );
     return rows[0];
   },
+
+  async getAllTransactions(bankId,acc_no){
+    const db=getbankDB(bankId);
+    const [sent]=await db.query("SELECT transaction_id,acc_no AS sender_acc_no,recv_bank,recv_acc_no,amount,timestamp,status FROM transactions WHERE acc_no=? ORDER BY timestamp DESC",[acc_no]);
+
+    const [received]=await db.query("SELECT transaction_id,acc_no AS receive_acc_no,recv_bank AS sender_bank,RECV_acc_no AS sender_acc_no,amount,timestamp,status FROM transactions WHERE recv_acc_no=? ORDER BY timestamp DESC",[acc_no]);
+    return {sent,received};
+  },
 };
 
 module.exports=Account;

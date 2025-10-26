@@ -43,3 +43,19 @@ exports.getAccountBalance = async (req, res) => {
   }
 };
 
+exports.getTransactionHistory=async(req,res)=>{
+  try{
+    const {bankId,acc_no}=req.params;
+    const account=await Account.getAccountByAccNo(bankId,acc_no);
+
+    if(!account) return res.status(404).json({message:"Account not found"});
+
+    if(account.user_id!==req.user.id) return res.status(403).json({message:"Unauthorized access"});
+
+    const transactions=await Account.getAllTransactions(bankId,acc_no);
+    res.status(200).json(transactions);
+  } catch(error){
+    console.error("Error fetching transaction history:",error);
+    res.status(500).json({error:"Failed to fetch transaction history"});
+  }
+};
