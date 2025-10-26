@@ -18,8 +18,18 @@ const bank1DB = createConnection("bank1_db");
 const bank2DB = createConnection("bank2_db");
 const bank3DB = createConnection("bank3_db");
 
+// Return the correct pool based on bankId
+function getBankDB(bankId) {
+  if (bankId === "bank1") return bank1DB;
+  if (bankId === "bank2") return bank2DB;
+  if (bankId === "bank3") return bank3DB;
+  throw new Error("Invalid bank ID");
+}
+
+// Export pools AND getBankDB selector
 module.exports = {
   bank1DB,
   bank2DB,
   bank3DB,
+  getBankDB,
 };
