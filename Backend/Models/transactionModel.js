@@ -10,42 +10,44 @@ const TransactionModel = {
       await db.query(query, [newAmount, acc_no]);
     }
   },
-  
-  async  recordTransactionHistory({ bank_id, acc_no, recv_bank,recv_acc_no,amount, status }) {
-  const db = getBankDB(bank_id);
-  const query = `
-    INSERT INTO transactions (acc_no,recv_bank,recv_acc_no, amount, status)
-    VALUES (?, ?, ?, ?, ?)
-  `;
-  const [result] = await db.query(query, [acc_no,recv_bank,recv_acc_no, amount, status]);
-  return result.transaction_id; // transaction_id_sender
+
+  // Updated: recordTransactionHistory now inserts explicitly sender_bank
+  async recordTransactionHistory({ bank_id, acc_no, recv_bank, recv_acc_no, amount, status }) {
+    const db = getBankDB(bank_id);
+    const query = `
+      INSERT INTO transactions (sender_bank, acc_no, recv_bank, recv_acc_no, amount, status)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await db.query(query, [
+      bank_id,     // sender_bank = bank_id passed
+      acc_no,
+      recv_bank,
+      recv_acc_no,
+      amount,
+      status,
+    ]);
+    return result.insertId; // transaction_id_sender
   },
-  async recordTransaction(
-    bankId,
-    senderAcc,
-    receiverAcc,
-    amount,
-    status,
-    connection = null
-  ) {
+
+  async recordTransaction(bankId, senderAcc, receiverAcc, amount, status, connection = null) {
     const db = getBankDB(bankId);
     const query = `
-      INSERT INTO transactions (acc_no, recv_bank, recv_acc_no, amount, status)
-      VALUES (?, ?, ?, ?,?)
+      INSERT INTO transactions (sender_bank, acc_no, recv_bank, recv_acc_no, amount, status)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
     if (connection) {
       await connection.query(query, [
+        bankId,       // sender_bank = bankId here
         senderAcc,
-        bankId,
+        bankId,       // assuming within bank transfer, receiver bank is same as sender bank
         receiverAcc,
         amount,
         status,
       ]);
     } else {
-      await db.query(query, [senderAcc, bankId, receiverAcc, amount, status]);
+      await db.query(query, [bankId, senderAcc, bankId, receiverAcc, amount, status]);
     }
   },
-
 };
 
 module.exports = TransactionModel;

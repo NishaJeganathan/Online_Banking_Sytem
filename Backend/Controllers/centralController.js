@@ -46,14 +46,16 @@ async function transaction(req, res) {
       newReceiverBalance
     );
 
+    // ...
     await TransactionModel.recordTransactionHistory({
-      bank_id: receiver_bank_id,
-      acc_no: receiver_acc,
-      recv_bank: sender_bank_id,
-      recv_acc_no: sender_acc,
-      amount,
-      status: "completed",
+    bank_id: sender_bank_id,
+    acc_no:  sender_acc,
+    recv_bank: receiver_bank_id,
+    recv_acc_no:receiver_acc,
+    amount: amount,
+    status: "completed",
     });
+// ...
 
     // 5. Update sender’s transaction entry to 'completed'
     const senderDB = getBankDB(sender_bank_id);

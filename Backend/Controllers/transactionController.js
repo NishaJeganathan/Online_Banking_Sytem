@@ -65,11 +65,26 @@ async function transferOut(req, res) {
     const newBalance = parseFloat(senderAccount.current_balance) - parseFloat(amount);
     await TransactionModel.updateBalance(sender_bank_id, sender_acc, newBalance);
 
-    const transactionIdSender = await TransactionModel.recordTransactionHistory({bank_id: sender_bank_id,
-      acc_no: sender_acc,recv_bank: receiver_bank_id,recv_acc_no: receiver_acc,amount,status: "pending",});
+    const transactionIdSender = await TransactionModel.recordTransactionHistory({
+      bank_id: sender_bank_id,
+      acc_no: sender_acc,
+      recv_bank: receiver_bank_id,
+      recv_acc_no: receiver_acc,
+      amount,
+      status: "pending",
+    });
 
-    const newRequest = {req_id: Date.now(),transaction_id_sender: transactionIdSender,sender_bank_id,
-      sender_acc,receiver_bank_id,receiver_acc,amount,status: "pending",timestamp: new Date().toISOString(),};
+    const newRequest = {
+      req_id: Date.now(),
+      transaction_id_sender: transactionIdSender,
+      sender_bank_id,
+      sender_acc,
+      receiver_bank_id,
+      receiver_acc,
+      amount,
+      status: "pending",
+      timestamp: new Date().toISOString(),
+    };
 
     await fs.mkdir(DATA_DIR, { recursive: true });
     let requests = [];
