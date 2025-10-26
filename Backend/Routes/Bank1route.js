@@ -1,5 +1,4 @@
 const express = require("express");
-<<<<<<< HEAD
 const router = express.Router();
 const accountController = require("../Controllers/accountController"); 
 
@@ -14,12 +13,5 @@ router.get("/:bankId/accounts/:acc_no/balance", accountController.getAccountBala
 
 router.get("/:bankId/accounts/:acc_no/transactions", accountController.getTransactionHistory);
 
-=======
-const { transferWithinBank } = require("../Controllers/transactionController");
-
-const router = express.Router();
-
-router.post("/transfer", transferWithinBank);
->>>>>>> 6afefc0168b2d77eb8e9f24bbb4a6ffe6848d994
 
 module.exports = router;
