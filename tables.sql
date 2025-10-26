@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS bank2_db;
 CREATE DATABASE IF NOT EXISTS bank3_db;
 
 USE bank1_db;
-
+drop table transactions;
 CREATE TABLE users (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -30,6 +30,7 @@ CREATE TABLE accounts (
 
 CREATE TABLE transactions (
   transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  sender_bank VARCHAR(50) NOT NULL,
   acc_no BIGINT NOT NULL,
   recv_bank VARCHAR(50) NOT NULL,
   recv_acc_no BIGINT NOT NULL,
@@ -44,12 +45,13 @@ CREATE TABLE transactions (
 
 USE bank2_db;
 
+drop table transactions;
 CREATE TABLE users LIKE bank1_db.users;
 CREATE TABLE accounts LIKE bank1_db.accounts;
 CREATE TABLE transactions LIKE bank1_db.transactions;
 
 USE bank3_db;
-
+drop table transactions;
 CREATE TABLE users LIKE bank1_db.users;
 CREATE TABLE accounts LIKE bank1_db.accounts;
 CREATE TABLE transactions LIKE bank1_db.transactions;
