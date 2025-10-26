@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS bank3_db;
 
 USE bank1_db;
 drop table transactions;
-CREATE TABLE users (
+CREATE TABLE if not EXISTS users (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE accounts (
+CREATE TABLE if not EXISTS accounts (
   acc_no BIGINT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   acc_type ENUM('savings', 'current', 'fixed') NOT NULL,
@@ -46,12 +46,12 @@ CREATE TABLE transactions (
 USE bank2_db;
 
 drop table transactions;
-CREATE TABLE users LIKE bank1_db.users;
-CREATE TABLE accounts LIKE bank1_db.accounts;
+CREATE TABLE if not EXISTS users LIKE bank1_db.users;
+CREATE TABLE if not EXISTS accounts LIKE bank1_db.accounts;
 CREATE TABLE transactions LIKE bank1_db.transactions;
 
 USE bank3_db;
 drop table transactions;
-CREATE TABLE users LIKE bank1_db.users;
-CREATE TABLE accounts LIKE bank1_db.accounts;
+CREATE TABLE if not EXISTS users LIKE bank1_db.users;
+CREATE TABLE if not EXISTS accounts LIKE bank1_db.accounts;
 CREATE TABLE transactions LIKE bank1_db.transactions;
