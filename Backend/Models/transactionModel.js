@@ -12,14 +12,22 @@ const TransactionModel = {
   },
 
   // Updated: recordTransactionHistory now inserts explicitly sender_bank
-  async recordTransactionHistory({ bank_id, acc_no, recv_bank, recv_acc_no, amount, status }) {
+  async recordTransactionHistory({
+    bank_id,
+    sender_bank,
+    acc_no,
+    recv_bank,
+    recv_acc_no,
+    amount,
+    status,
+  }) {
     const db = getBankDB(bank_id);
     const query = `
       INSERT INTO transactions (sender_bank, acc_no, recv_bank, recv_acc_no, amount, status)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const [result] = await db.query(query, [
-      bank_id,     // sender_bank = bank_id passed
+      sender_bank, // sender_bank = bank_id passed
       acc_no,
       recv_bank,
       recv_acc_no,
@@ -28,8 +36,32 @@ const TransactionModel = {
     ]);
     return result.insertId; // transaction_id_sender
   },
-
-  async recordTransaction(bankId, senderAcc, receiverAcc, amount, status, connection = null) {
+  async updateTransactionStatus({
+    bankId,
+    transactionId,
+    status,
+  }) {
+    console.log(bankId);
+    console.log("checkpoint 4.1");
+    
+    const db = bank1DB;//getBankId(bankId);
+    const query = `
+          UPDATE transactions
+          SET status = ?
+          WHERE transaction_id = ?
+      `;
+    console.log("checkpoint 4.1");
+    await db.query(query, [status, transactionId]);
+  },
+  async recordTransaction(
+    bankId,
+    sender_bank,
+    senderAcc,
+    receiverAcc,
+    amount,
+    status,
+    connection = null
+  ) {
     const db = getBankDB(bankId);
     const query = `
       INSERT INTO transactions (sender_bank, acc_no, recv_bank, recv_acc_no, amount, status)
@@ -37,17 +69,25 @@ const TransactionModel = {
     `;
     if (connection) {
       await connection.query(query, [
-        bankId,       // sender_bank = bankId here
+        sender_bank, // sender_bank = bankId here
         senderAcc,
-        bankId,       // assuming within bank transfer, receiver bank is same as sender bank
+        bankId, // assuming within bank transfer, receiver bank is same as sender bank
         receiverAcc,
         amount,
         status,
       ]);
     } else {
-      await db.query(query, [bankId, senderAcc, bankId, receiverAcc, amount, status]);
+      await db.query(query, [
+        bankId,
+        senderAcc,
+        bankId,
+        receiverAcc,
+        amount,
+        status,
+      ]);
     }
   },
+  // Updates the status of a transaction in the specified bank's transaction_history table
 };
 
 module.exports = TransactionModel;

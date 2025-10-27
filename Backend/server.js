@@ -13,10 +13,15 @@ app.get("/", (req, res) => {
 });
 
 // Start the server
-const Bank1route = require("./Routes/Bank1route"); // adjust path if needed
+const Bank1route = require("./Routes/Bank1route"); 
+const Bank2route = require("./Routes/Bank2route"); 
+const Bank3route = require("./Routes/Bank3route"); 
+const Central = require("./Routes/Centralroute");
 
-// Use Bank1 routes on '/bank1'
-app.use("/bank", Bank1route);
+app.use("/api/b1", Bank1route);
+app.use("/api/b2", Bank2route);
+app.use("/api/b3", Bank3route);
+app.use("/admin", Central);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

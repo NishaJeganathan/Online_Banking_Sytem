@@ -1,79 +1,90 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
+// 📝 Register User
 exports.registerUser = async (req, res) => {
   try {
-    const bankId = bank1;
-    const { username, password, mobile, age, gender } = req.body;
+    const { bankId } = req.params;
+    const { username, password, mobile , age , gender  } = req.body;
 
     if (!username || !password) {
       return res
         .status(400)
-        .json({ message: "Username and password required" });
+        .json({ message: "Username and password are required" });
     }
 
+    // Check if user already exists
     const existingUser = await User.findByUsername(bankId, username);
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Directly insert password (⚠️ No hashing used here — for testing only)
     const userId = await User.createUser(
       bankId,
       username,
-      hashedPassword,
+      password,
       mobile,
       age,
       gender
     );
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: `User registered successfully in ${bankId}`,
       userId,
     });
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("Register Error:", error);
     res.status(500).json({ message: "User registration failed" });
   }
 };
 
+// 🔑 Login User
 exports.loginUser = async (req, res) => {
   try {
-    const { bankId } = req.params;
+     const { bankId } = req.params;
     const { username, password } = req.body;
 
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required" });
+    }
+
     const user = await User.findByUsername(bankId, username);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    // Simple password comparison (⚠️ No bcrypt)
+    if (user.password !== password) {
       return res.status(401).json({ message: "Invalid credentials" });
-
-    const token = jwt.sign(
-      { id: user.user_id, username: user.username, bankId },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    }
 
     res.status(200).json({
-      message: "Login successful",
-      token,
+      message: `Login successful in ${bankId}`,
+      user: {
+        user_id: user.user_id,
+        username: user.username,
+        mobile: user.mobile,
+        age: user.age,
+        gender: user.gender,
+      },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login Error:", error);
     res.status(500).json({ message: "Login failed" });
   }
 };
 
+// 👤 Get User Info
 exports.getUserInfo = async (req, res) => {
   try {
     const { bankId } = req.params;
-    const user = await User.findById(bankId, req.user.id);
+    const { userId } = req.query; // example: /api/bank/bank1/user?userId=5
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await User.findById(bankId, userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    delete user.password; // Hide password
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user info:", error);

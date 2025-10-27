@@ -1,10 +1,14 @@
-// centralRoutes.js
+
+// centralroute.js
 const express = require("express");
-const { transaction } = require("../Controllers/centralController");
+const { transaction, centralSys } = require("../Controllers/centralController");
 
 const router = express.Router();
 
-// Route to approve and process interbank transaction
-router.post("/central/transaction", transaction);
+// Route to display interbank transaction requests with proceed buttons
+router.get("/central", centralSys);
+
+// Route to approve and process interbank transaction (POST)
+router.post("/transaction", transaction);
 
 module.exports = router;

@@ -16,14 +16,22 @@ async function transferWithinBank(req, res) {
   try {
     await connection.beginTransaction();
 
-    const senderAccount = await AccountModel.getAccountByAccNo(bankId, senderAccNo);
+    const senderAccount = await AccountModel.getAccountByAccNo(
+      bankId,
+      senderAccNo
+    );
     if (!senderAccount) {
       return res.status(404).json({ message: "Invalid sender account number" });
     }
 
-    const receiverAccount = await AccountModel.getAccountByAccNo(bankId, receiverAccNo);
+    const receiverAccount = await AccountModel.getAccountByAccNo(
+      bankId,
+      receiverAccNo
+    );
     if (!receiverAccount) {
-      return res.status(404).json({ message: "Invalid receiver account number" });
+      return res
+        .status(404)
+        .json({ message: "Invalid receiver account number" });
     }
 
     const senderCurrentBalance = parseFloat(senderAccount.current_balance);
@@ -37,9 +45,27 @@ async function transferWithinBank(req, res) {
       return res.status(400).json({ message: "Insufficient balance" });
     }
 
-    await TransactionModel.updateBalance(bankId, receiverAccNo, receiverNewBalance, connection);
-    await TransactionModel.updateBalance(bankId, senderAccNo, senderNewBalance, connection);
-    await TransactionModel.recordTransaction(bankId, senderAccNo, receiverAccNo, amountNum, "completed", connection);
+    await TransactionModel.updateBalance(
+      bankId,
+      receiverAccNo,
+      receiverNewBalance,
+      connection
+    );
+    await TransactionModel.updateBalance(
+      bankId,
+      senderAccNo,
+      senderNewBalance,
+      connection
+    );
+    await TransactionModel.recordTransaction(
+      bankId,
+      bankId,
+      senderAccNo,
+      receiverAccNo,
+      amountNum,
+      "completed",
+      connection
+    );
 
     await connection.commit();
     res.status(200).json({ message: "Transfer successful" });
@@ -52,28 +78,39 @@ async function transferWithinBank(req, res) {
 }
 
 async function transferOut(req, res) {
-  const { sender_bank_id, sender_acc, receiver_bank_id, receiver_acc, amount } = req.body;
+  const { sender_bank_id, sender_acc, receiver_bank_id, receiver_acc, amount } =
+    req.body;
 
   try {
-    const senderAccount = await AccountModel.getAccountByAccNo(sender_bank_id, sender_acc);
+    const senderAccount = await AccountModel.getAccountByAccNo(
+      sender_bank_id,
+      sender_acc
+    );
     if (!senderAccount) {
       return res.status(404).json({ message: "Invalid sender account" });
     }
     if (parseFloat(senderAccount.current_balance) < parseFloat(amount)) {
       return res.status(400).json({ message: "Insufficient funds" });
     }
-    const newBalance = parseFloat(senderAccount.current_balance) - parseFloat(amount);
-    await TransactionModel.updateBalance(sender_bank_id, sender_acc, newBalance);
-
-    const transactionIdSender = await TransactionModel.recordTransactionHistory({
-      bank_id: sender_bank_id,
-      acc_no: sender_acc,
-      recv_bank: receiver_bank_id,
-      recv_acc_no: receiver_acc,
-      amount,
-      status: "pending",
-    });
-
+    const newBalance =
+      parseFloat(senderAccount.current_balance) - parseFloat(amount);
+    await TransactionModel.updateBalance(
+      sender_bank_id,
+      sender_acc,
+      newBalance
+    );
+    const stringified = JSON.stringify(req.sender_bank_id);
+    const transactionIdSender = await TransactionModel.recordTransactionHistory(
+      {
+        bank_id: sender_bank_id,
+        sender_bank: sender_bank_id,
+        acc_no: sender_acc,
+        recv_bank: receiver_bank_id,
+        recv_acc_no: receiver_acc,
+        amount,
+        status: "pending",
+      }
+    );
     const newRequest = {
       req_id: Date.now(),
       transaction_id_sender: transactionIdSender,
@@ -100,11 +137,14 @@ async function transferOut(req, res) {
     await fs.writeFile(REQUESTS_FILE, JSON.stringify(requests, null, 2));
 
     res.status(200).json({
-      message: "Transfer request recorded and amount deducted. Pending admin approval.",
+      message:
+        "Transfer request recorded and amount deducted. Pending admin approval.",
       request_id: newRequest.req_id,
     });
   } catch (error) {
-    res.status(500).json({ message: "Transfer request failed", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Transfer request failed", error: error.message });
   }
 }
 
