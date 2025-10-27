@@ -9,11 +9,11 @@ const userController = require("../Controllers/userController");
 const middleware = require("../Middleware/userMiddleware");
 
 // register
-router.post("/register", middleware.verifyToken, userController.registerUser);
+router.post("/register", userController.registerUser);
 
 // login
-router.post("/login", middleware.verifyToken, userController.loginUser);
-
+router.post("/login", userController.loginUser);
+router.get("/:bankId/me", middleware.verifyToken, userController.getUserInfo);
 //transfer within bank
 router.post("/transfer", transferWithinBank);
 

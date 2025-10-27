@@ -4,11 +4,13 @@ const User = require("../Models/userModel");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { bankId } = req.params;
+    const bankId = bank1;
     const { username, password, mobile, age, gender } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password required" });
+      return res
+        .status(400)
+        .json({ message: "Username and password required" });
     }
 
     const existingUser = await User.findByUsername(bankId, username);
@@ -17,7 +19,14 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = await User.createUser(bankId, username, hashedPassword, mobile, age, gender);
+    const userId = await User.createUser(
+      bankId,
+      username,
+      hashedPassword,
+      mobile,
+      age,
+      gender
+    );
 
     res.status(201).json({
       message: "User registered successfully",
@@ -38,7 +47,8 @@ exports.loginUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
       { id: user.user_id, username: user.username, bankId },
@@ -53,5 +63,20 @@ exports.loginUser = async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Login failed" });
+  }
+};
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const { bankId } = req.params;
+    const user = await User.findById(bankId, req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    delete user.password; // Hide password
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    res.status(500).json({ error: "Failed to fetch user info" });
   }
 };
