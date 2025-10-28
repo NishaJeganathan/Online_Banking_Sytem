@@ -11,7 +11,6 @@ const TransactionModel = {
     }
   },
 
-  
   async recordTransactionHistory({
     bank_id,
     sender_bank,
@@ -27,31 +26,26 @@ const TransactionModel = {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const [result] = await db.query(query, [
-      sender_bank, 
+      sender_bank,
       acc_no,
       recv_bank,
       recv_acc_no,
       amount,
       status,
     ]);
-    return result.transaction_Id; // transaction_id_sender
+    return result.insertId;
   },
-  async updateTransactionStatus({
-    bankId,
-    transactionId,
-    status,
-  }) {
-    console.log(bankId);
-    console.log("checkpoint 4.1");
-    
-    const db =getBankId(bankId);// bank1DB;
+  async updateTransactionStatus({ bankId, transactionId, status }) {
+    const db = getBankDB(bankId);
     const query = `
           UPDATE transactions
           SET status = ?
           WHERE transaction_id = ?
       `;
+    console.log(transactionId);
     console.log("checkpoint 4.1");
     await db.query(query, [status, transactionId]);
+    console.log("checkpoint 4.2");
   },
   async recordTransaction(
     bankId,
@@ -69,7 +63,7 @@ const TransactionModel = {
     `;
     if (connection) {
       await connection.query(query, [
-        sender_bank, // sender_bank = bankId here
+        sender_bank,
         senderAcc,
         bankId, // assuming within bank transfer, receiver bank is same as sender bank
         receiverAcc,

@@ -8,38 +8,5 @@
     "amount": 1500,
     "status": "completed",
     "timestamp": "2025-10-26T18:37:52.469Z"
-  },
-  {
-    "req_id": 1761537257371,
-    "transaction_id_sender": 4,
-    "sender_bank_id": "bank1",
-    "sender_acc": 1,
-    "receiver_bank_id": "bank2",
-    "receiver_acc": 2,
-    "amount": 1000,
-    "status": "completed",
-    "timestamp": "2025-10-27T03:54:17.371Z"
-  },
-  {
-    "req_id": 1761538894886,
-    "transaction_id_sender": 6,
-    "sender_bank_id": "bank1",
-    "sender_acc": 1,
-    "receiver_bank_id": "bank2",
-    "receiver_acc": 3,
-    "amount": 1000,
-    "status": "completed",
-    "timestamp": "2025-10-27T04:21:34.886Z"
-  },
-  {
-    "req_id": 1761540273263,
-    "transaction_id_sender": 7,
-    "sender_bank_id": "bank1",
-    "sender_acc": 1,
-    "receiver_bank_id": "bank2",
-    "receiver_acc": 3,
-    "amount": 100,
-    "status": "pending",
-    "timestamp": "2025-10-27T04:44:33.263Z"
   }
 ]

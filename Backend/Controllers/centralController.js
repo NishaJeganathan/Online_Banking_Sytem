@@ -31,9 +31,10 @@ async function centralSys(req, res) {
             <tr>
               <th>Request ID</th>
               <th>Sender Bank</th>
+              <th>Sender account</th>
               <th>Receiver Bank</th>
+              <th>Sender account</th>
               <th>Amount</th>
-              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -45,9 +46,10 @@ async function centralSys(req, res) {
         <tr>
           <td>${r.req_id}</td>
           <td>${r.sender_bank_id}</td>
+          <td>${r.sender_acc}</td>
           <td>${r.receiver_bank_id}</td>
+          <td>${r.receiver_acc}</td>
           <td>${r.amount}</td>
-          <td>${r.status}</td>
           <td>
             ${
               r.status !== "completed"
@@ -120,7 +122,6 @@ async function transaction(req, res) {
       amount,
       status,
     } = request;
-
     if (status === "completed") {
       return res.status(400).json({ message: "Transaction already completed" });
     }
@@ -148,7 +149,7 @@ async function transaction(req, res) {
     // Record transaction history for sender
     await TransactionModel.recordTransactionHistory({
       bank_id: receiver_bank_id,
-      sender_bank:sender_bank_id,
+      sender_bank: sender_bank_id,
       acc_no: sender_acc,
       recv_bank: receiver_bank_id,
       recv_acc_no: receiver_acc,
@@ -156,16 +157,19 @@ async function transaction(req, res) {
       status: "completed",
     });
 
-    console.log("checkpoint 4");
+    console.log(sender_bank_id);
+    console.log(transaction_id_sender);
     // Update sender's transaction status in DB
-    await TransactionModel.updateTransactionStatus(
-        sender_bank_id,
-        transaction_id_sender,
-        "completed"
-    );
+    await TransactionModel.updateTransactionStatus({
+      bankId: sender_bank_id,
+      transactionId: transaction_id_sender,
+      status: "completed",
+    });
     console.log("checkpoint 5");
     // Update JSON request status and overwrite file
-    const requestIndex = requests.findIndex((r) => r.req_id === parseInt(req_id));
+    const requestIndex = requests.findIndex(
+      (r) => r.req_id === parseInt(req_id)
+    );
     requests[requestIndex].status = "completed";
     await fs.writeFile(REQUESTS_FILE, JSON.stringify(requests, null, 2));
 
