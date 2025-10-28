@@ -100,6 +100,7 @@ async function transferOut(req, res) {
       newBalance
     );
     const stringified = JSON.stringify(req.sender_bank_id);
+    console.log(stringified);
     const transactionIdSender = await TransactionModel.recordTransactionHistory(
       {
         bank_id: sender_bank_id,

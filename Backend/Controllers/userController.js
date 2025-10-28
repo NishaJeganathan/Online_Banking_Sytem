@@ -1,15 +1,13 @@
 const User = require("../Models/userModel");
-
+const accountModel = require("../Models/accountModel");
 // 📝 Register User
 exports.registerUser = async (req, res) => {
   try {
     const { bankId } = req.params;
-    const { username, password, mobile , age , gender  } = req.body;
+    const { username, password, acc_no, mobile, age, gender } = req.body;
 
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: "Username and password are required" });
+      return res.status(400).json({ message: "Username and password are required" });
     }
 
     // Check if user already exists
@@ -18,15 +16,20 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Directly insert password (⚠️ No hashing used here — for testing only)
-    const userId = await User.createUser(
-      bankId,
-      username,
-      password,
-      mobile,
-      age,
-      gender
-    );
+    // Check if account exists
+    console.log("Checking account for bankId:", bankId, "acc_no:", acc_no);
+    const account = await accountModel.getAccountByAccNo(bankId, acc_no);
+    console.log("Account found:", account);
+
+    if (!account) {
+      return res.status(400).json({ message: "Account does not exist" });
+    }
+
+    // Create user (no password hashing for now)
+    const userId = await User.createUser(bankId, username, password, mobile, age, gender);
+
+    // Link the new user with the account
+    await accountModel.addAccountUserLink(bankId, acc_no, userId);
 
     res.status(201).json({
       message: `User registered successfully in ${bankId}`,
@@ -38,7 +41,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// 🔑 Login User
+
 exports.loginUser = async (req, res) => {
   try {
      const { bankId } = req.params;
@@ -74,7 +77,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// 👤 Get User Info
+// Get User Info
 exports.getUserInfo = async (req, res) => {
   try {
     const { bankId } = req.params;

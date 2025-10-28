@@ -11,7 +11,7 @@ const TransactionModel = {
     }
   },
 
-  // Updated: recordTransactionHistory now inserts explicitly sender_bank
+  
   async recordTransactionHistory({
     bank_id,
     sender_bank,
@@ -27,14 +27,14 @@ const TransactionModel = {
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     const [result] = await db.query(query, [
-      sender_bank, // sender_bank = bank_id passed
+      sender_bank, 
       acc_no,
       recv_bank,
       recv_acc_no,
       amount,
       status,
     ]);
-    return result.insertId; // transaction_id_sender
+    return result.transaction_Id; // transaction_id_sender
   },
   async updateTransactionStatus({
     bankId,
@@ -44,7 +44,7 @@ const TransactionModel = {
     console.log(bankId);
     console.log("checkpoint 4.1");
     
-    const db = bank1DB;//getBankId(bankId);
+    const db =getBankId(bankId);// bank1DB;
     const query = `
           UPDATE transactions
           SET status = ?

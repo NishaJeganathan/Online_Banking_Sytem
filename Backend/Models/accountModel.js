@@ -12,11 +12,20 @@ const Account = {
   async getAccountByAccNo(bankId, acc_no) {
     const db = getBankDB(bankId);
     const [rows] = await db.query(
-      "SELECT acc_no, user_id, acc_type, current_balance, min_balance, interest FROM accounts WHERE acc_no = ?",
+      "SELECT acc_no,acc_type, current_balance, min_balance, interest FROM accounts WHERE acc_no = ?",
       [acc_no]
     );
     return rows[0];
   },
+  async addAccountUserLink(bankId, acc_no, user_id) {
+    const db = getBankDB(bankId);
+    const query = `
+      INSERT INTO account_user_links (acc_no, user_id)
+      VALUES (?, ?)
+    `;
+    await db.query(query, [acc_no, user_id]);
+  },
+
   async getBalance(bankId, acc_no) {
     const db = getBankDB(bankId);
     const [rows] = await db.query(
