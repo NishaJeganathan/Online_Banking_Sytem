@@ -24,5 +24,5 @@ router.post("/transfer", transferWithinBank);
 router.post("/transfer/other", transferOut);
 
 router.post("/accounts/transactions", accountController.getTransactionHistory);
-
+router.get("/accounts/details/:bankId/:acc_no",accountController.getAccountDetails);
 module.exports = router;

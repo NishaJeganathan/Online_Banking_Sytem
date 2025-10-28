@@ -6,6 +6,7 @@ const {
 
 const router = express.Router();
 const userController = require("../Controllers/userController");
+const accountController = require("../Controllers/accountController");
 
 // register
 router.post("/register/:bankId", userController.registerUser);
@@ -21,5 +22,7 @@ router.post("/transfer", transferWithinBank);
 
 // Route for interbank transfers
 router.post("/transfer/other", transferOut);
+
+router.post("/accounts/transactions", accountController.getTransactionHistory);
 
 module.exports = router;

@@ -25,7 +25,14 @@ const Account = {
     `;
     await db.query(query, [acc_no, user_id]);
   },
-
+  async getAccountUserLink(bankId, acc_no) {
+    const db = getBankDB(bankId);
+    console.log(1);
+    const query = `Select * from account_user_links where acc_no=?`;
+    const [rows] = await db.query(query, [acc_no]);
+    
+    return rows[0];
+  },
   async getBalance(bankId, acc_no) {
     const db = getBankDB(bankId);
     const [rows] = await db.query(

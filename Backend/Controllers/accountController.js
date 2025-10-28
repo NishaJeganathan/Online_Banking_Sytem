@@ -79,8 +79,6 @@ exports.getAccountDetails = async (req, res) => {
     const account = await Account.getAccountByAccNo(bankId, acc_no);
 
     if (!account) return res.status(404).json({ message: "Account not found" });
-    if (account.user_id !== req.user.id)
-      return res.status(403).json({ message: "Unauthorized access" });
 
     res.status(200).json(account);
   } catch (error) {
@@ -109,12 +107,12 @@ exports.getTransactionHistory = async (req, res) => {
     const { bankId, acc_no, userId } = req.body;
 
     const account = await Account.getAccountByAccNo(bankId, acc_no);
-
+    const ui= await Account.getAccountUserLink(bankId,acc_no);
     if (!account) {
       return res.status(404).json({ message: "Account not found" });
     }
-
-    if (String(account.user_id) !== String(userId)) {
+    console.log(ui);
+    if (String(ui.user_id) !== String(userId)) {
       return res
         .status(403)
         .json({ message: "Unauthorized access to this account" });
