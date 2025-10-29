@@ -66,7 +66,6 @@ async function transferWithinBank(req, res) {
       "completed",
       connection
     );
-
     await connection.commit();
     res.status(200).json({ message: "Transfer successful" });
   } catch (error) {
